@@ -32,7 +32,15 @@ namespace BosunConsole
                 {
                     bc_FoundCommander(bc.CommanderName);
                 }
-                LogMessage("Bosun Ready, last recorded system is {0}", bc.LastSystemName);
+                if (bc.LastSystemName != null)
+                {
+                    long sysid;
+                    LogMessage("Bosun Ready, last recorded system is {0}", bc.LastSystemName);
+                    if (bc.LookupEDDBSystemID(bc.LastSystemName, out sysid))
+                    {
+                        LogMessage("EDDB: http://eddb.io/system/{0} - {1}", sysid, bc.LastSystemName);
+                    }
+                }
 
                 bc.FoundCommander += bc_FoundCommander;
                 bc.StarSystemEntered += sl_EnterStarSystem;
@@ -67,6 +75,7 @@ namespace BosunConsole
         static void sl_EnterStarSystem(string name, long id, string url)
         {
             LogMessage("Arrived at {0}", name);
+            LogMessage("EDDB: {0}", url);
         }
 
         

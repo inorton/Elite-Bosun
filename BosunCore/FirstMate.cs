@@ -7,6 +7,7 @@ using LogMonitor;
 using System.Threading;
 using System.Net;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace BosunCore
 {
@@ -81,7 +82,8 @@ namespace BosunCore
                 long sysid;
                 if (LookupEDDBSystemID(name, out sysid))
                 {
-                    StarSystemEntered(name, sysid, null);
+                    var surl = String.Format("http://eddb.io/system/{0}", sysid);
+                    StarSystemEntered(name, sysid, surl);
                 }
             }
             waitforevent.Set();
@@ -135,9 +137,8 @@ namespace BosunCore
             waitforevent.WaitOne();            
         }
 
-        bool LookupEDDBSystemID(string name, out long sysid)
-        {
-            bool rv = false;
+        public bool LookupEDDBSystemID(string name, out long sysid)
+        {            
             sysid = -1;
             if (Monitor.TryEnter(eddbSystems)) {
                 try
@@ -146,7 +147,28 @@ namespace BosunCore
                     {
                         var eddburl = String.Format("http://eddb.io/system/search?system%5Bmultiname%5D={0}", name);
                         var jsonstr = GetJsonString(eddburl);
-                        Console.WriteLine(jsonstr);
+                        var data = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(jsonstr);
+
+                        foreach (var item in data) {
+                            if (item.ContainsKey("id"))
+                            {
+                                if (item.ContainsKey("name"))
+                                {
+                                    if (item["name"] == name)
+                                    {
+                                        try
+                                        {
+                                            sysid = long.Parse(item["id"]);
+                                            eddbSystems[name] = sysid;
+                                            return true;
+                                        }
+                                        catch (FormatException)
+                                        {
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 finally
@@ -154,7 +176,7 @@ namespace BosunCore
                     Monitor.Exit(eddbSystems);
                 }
             }
-            return rv;
+            return false;
         }
 
         string GetJsonString(string url)
