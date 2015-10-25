@@ -10,6 +10,7 @@ namespace BosunCore
 {
     public class BosunConfiguration
     {
+        static object configloader = new object();
         static Dictionary<string, string> configs = null;
         
         public static string GetFileName() 
@@ -21,11 +22,18 @@ namespace BosunCore
 
         public static void Load()
         {
-            var filename = GetFileName();
-            if (File.Exists(filename))
+            lock (configloader)
             {
-                var cfgstr = File.ReadAllText(filename);
-                configs = JsonConvert.DeserializeObject<Dictionary<string, string>>(cfgstr);
+                if (configs == null)
+                {
+                    configs = new Dictionary<string, string>();
+                    var filename = GetFileName();
+                    if (File.Exists(filename))
+                    {
+                        var cfgstr = File.ReadAllText(filename);
+                        configs = JsonConvert.DeserializeObject<Dictionary<string, string>>(cfgstr);
+                    }
+                }
             }
         }
 
@@ -54,9 +62,12 @@ namespace BosunCore
             }
             lock (configs)
             {
-                string rv = defaultvalue;
-                configs.TryGetValue(keyname, out rv);
-                return rv;
+                string rv = null;
+                if (configs.TryGetValue(keyname, out rv))
+                {
+                    return rv;
+                }
+                return defaultvalue;
             }
         }        
     }

@@ -114,6 +114,11 @@ namespace LogMonitor
         bool listedLogs = false;
         public List<string> ListLogs()
         {
+            var logfolder = GetLogFolder();
+            if (logfolder == null)
+            {
+                return new List<string>();
+            }
             var logs = System.IO.Directory.GetFiles(GetLogFolder(), "netlog*.log");
             int takelogs = 3;
             if (listedLogs)

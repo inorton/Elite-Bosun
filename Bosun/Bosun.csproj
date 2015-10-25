@@ -100,6 +100,16 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BosunCore\BosunCore.csproj">
+      <Project>{48b89df4-aaff-49d3-9b02-0d2a429439da}</Project>
+      <Name>BosunCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LogMonitor\LogMonitor.csproj">
+      <Project>{a644ab0b-fbf3-4514-9fab-28a7eab716c8}</Project>
+      <Name>LogMonitor</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
