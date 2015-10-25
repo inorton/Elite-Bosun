@@ -51,6 +51,11 @@ namespace Bosun
             var sl = new ShipLocator();
             Mate = new FirstMate(sl);
 
+            Mate.StarSystemEntered += (name, id, url) =>
+            {
+                UpdateBrowser(name, url);
+            };
+
             Mate.Start();
 
             ThreadPool.QueueUserWorkItem((x) =>
@@ -68,6 +73,8 @@ namespace Bosun
 
         void MainBrowser_LoadCompleted(object sender, NavigationEventArgs e)
         {
+            // this doesnt work too reliably and crashes alot :-/
+#if false
             Dispatcher.BeginInvoke((Action)(() =>
             {
                 mshtml.HTMLDocument doc = MainBrowser.Document as mshtml.HTMLDocument;
@@ -95,6 +102,7 @@ namespace Bosun
                     }
                 }
             }));
+#endif
         }
 
 
