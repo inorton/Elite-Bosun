@@ -55,6 +55,12 @@ namespace BosunConsole
 
             var sl = new ShipLocator();
 
+            if (!sl.CheckAppConfigXml(false))
+            {
+                LogMessage("{0}/{1} VerboseLogging not enabled. Please fix and restart Elite: Dangerous",
+                    eddir, "appconfig.xml");
+            }
+
             LogMessage("Appointing First Mate..");
             var bc = new BosunCore.FirstMate(sl);
 

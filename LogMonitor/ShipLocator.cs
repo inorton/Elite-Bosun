@@ -139,7 +139,7 @@ namespace LogMonitor
 
         Dictionary<string, long> positions = new Dictionary<string, long>();
 
-        public bool UpdateAppConfigXml()
+        public bool CheckAppConfigXml(bool enableVerboseLogging)
         {
             var edf = FindEDFolder();
 
@@ -162,12 +162,15 @@ namespace LogMonitor
                     }
                 }
             }
-            if (!log_enabled)
+            if (enableVerboseLogging)
             {
-                var newattr = appc.CreateAttribute("VerboseLogging");
-                newattr.Value = "1";
-                network.Attributes.Append(newattr);
-                appc.Save(xml);
+                if (!log_enabled)
+                {
+                    var newattr = appc.CreateAttribute("VerboseLogging");
+                    newattr.Value = "1";
+                    network.Attributes.Append(newattr);
+                    appc.Save(xml);
+                }
             }
             return log_enabled;
         }

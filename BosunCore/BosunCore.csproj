@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BosunConfiguration.cs" />
     <Compile Include="FirstMate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WatchKeeper.cs" />
