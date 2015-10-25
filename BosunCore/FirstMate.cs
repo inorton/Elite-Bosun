@@ -23,7 +23,9 @@ namespace BosunCore
         ShipLocator logmon { get; set; }
         bool stop = false;
         Thread monThread = null;
-        AutoResetEvent waitforevent = new AutoResetEvent(false);
+
+        ManualResetEvent waiter = new ManualResetEvent(false);
+        
         WatchKeeper server = null;
         Dictionary<string, long> eddbSystems = new Dictionary<string, long>();
 
@@ -65,13 +67,19 @@ namespace BosunCore
             }
         }
 
+        void NotifyChanged()
+        {
+            waiter.Set();
+            waiter.Reset();
+        }
+
         void OnFoundCommander(string name)
         {
             if (FoundCommander != null)
             {
                 FoundCommander(name);
             }
-            waitforevent.Set();
+            NotifyChanged();
         }
 
         void OnEnterSystem(long id, string name)
@@ -84,7 +92,8 @@ namespace BosunCore
                     StarSystemEntered(name, sysid, GetEDDBSystemUrl(name));
                 }
             }
-            waitforevent.Set();
+
+            NotifyChanged();
         }
 
         void OnDockingRequestGranted()
@@ -93,7 +102,7 @@ namespace BosunCore
             {
                 DockingRequestGranted();
             }
-            waitforevent.Set();
+            NotifyChanged();
         }
 
         void LogMonitorThread(object o)
@@ -145,7 +154,7 @@ namespace BosunCore
 
         public void Wait()
         {
-            waitforevent.WaitOne();            
+            waiter.WaitOne();
         }
 
         public string GetEDDBSystemUrl(string name)

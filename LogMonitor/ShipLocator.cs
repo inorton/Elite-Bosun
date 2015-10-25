@@ -4,6 +4,7 @@ using System.IO;
 using System.Xml;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace LogMonitor
 {
@@ -54,13 +55,13 @@ namespace LogMonitor
         {
             if (edFolder == null)
             {
-#if false
-                // look for FORC_FDEV folder
-                var appdata = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                var fd = "Frontier_Developments";
-                var find = System.IO.Path.Combine(appdata, fd);
-                edFolder = WalkDirs(find, "FORC-FDEV-D");
-#endif
+                // look for ED running.
+                var procs = Process.GetProcessesByName("EliteDangerous32");
+                if (procs.Length == 1) {
+                    var ed = procs[0];
+                    var edexe = ed.MainModule.FileName;
+                    edFolder = Path.GetDirectoryName(edexe);
+                }
             }
             return edFolder;
         }

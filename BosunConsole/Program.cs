@@ -21,45 +21,65 @@ namespace BosunConsole
 
         static void Main(string[] args)
         {
+            foreach (var help in new string[] { "-h", "--help", "/?", "/help" })
+            {
+                if (args.Contains(help))
+                {
+                    Console.WriteLine("Usage: bosunconsole PATH_TO_ED_FOLDER");
+                    Console.ReadKey();
+                    return;
+                }
+            }
+
             if ((args.Length > 0) && Directory.Exists(args[0]))
             {
                 ShipLocator.OverrideEDFolder(args[0]);
-                var sl = new ShipLocator();
-
-                var bc = new BosunCore.FirstMate(sl);
-
-                if (bc.CommanderName != null)
-                {
-                    bc_FoundCommander(bc.CommanderName);
-                }
-                if (bc.LastSystemName != null)
-                {
-                    long sysid;
-                    LogMessage("Bosun Ready, last recorded system is {0}", bc.LastSystemName);
-                    if (bc.LookupEDDBSystemID(bc.LastSystemName, out sysid))
-                    {
-                        LogMessage("EDDB: http://eddb.io/system/{0} - {1}", sysid, bc.LastSystemName);
-                    }
-                }
-
-                bc.FoundCommander += bc_FoundCommander;
-                bc.StarSystemEntered += sl_EnterStarSystem;
-                bc.DockingRequestGranted += bc_DockingRequestGranted;
-
-                bc.Start();
-
-                while (true)
-                {
-                    bc.Wait();
-                }
-
             }
-            else
+
+            LogMessage("Bosun starting up..");
+
+            var eddir = ShipLocator.GetLogFolder();
+
+            if (eddir == null)
             {
-                Console.WriteLine("Usage: bosunconsole PATH_TO_ED_FOLDER");
-                Console.ReadKey();
+                LogMessage("waiting for ED to start..");
             }
 
+            do
+            {
+                Thread.Sleep(5000);                
+                eddir = ShipLocator.GetLogFolder();                
+            } while (eddir == null);
+
+
+            var sl = new ShipLocator();
+
+            var bc = new BosunCore.FirstMate(sl);
+
+            if (bc.CommanderName != null)
+            {
+                bc_FoundCommander(bc.CommanderName);
+            }
+            if (bc.LastSystemName != null)
+            {
+                long sysid;
+                LogMessage("Bosun Ready, last recorded system is {0}", bc.LastSystemName);
+                if (bc.LookupEDDBSystemID(bc.LastSystemName, out sysid))
+                {
+                    LogMessage("EDDB: http://eddb.io/system/{0} - {1}", sysid, bc.LastSystemName);
+                }
+            }
+
+            bc.FoundCommander += bc_FoundCommander;
+            bc.StarSystemEntered += sl_EnterStarSystem;
+            bc.DockingRequestGranted += bc_DockingRequestGranted;
+
+            bc.Start();
+
+            while (true)
+            {
+                bc.Wait();
+            }
         }
 
         static void bc_FoundCommander(string name)
