@@ -1,0 +1,3 @@
+[submodule "lib/xr-http-json"]
+	path = lib/xr-http-json
+	url = git@github.com:inorton/xr-http-json.git

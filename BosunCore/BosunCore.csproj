@@ -44,8 +44,13 @@
   <ItemGroup>
     <Compile Include="FirstMate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WatchKeeper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\lib\xr-http-json\WebServer\WebServer.csproj">
+      <Project>{20d55278-aea8-46b1-97f3-c2a6d0135ff5}</Project>
+      <Name>WebServer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LogMonitor\LogMonitor.csproj">
       <Project>{a644ab0b-fbf3-4514-9fab-28a7eab716c8}</Project>
       <Name>LogMonitor</Name>

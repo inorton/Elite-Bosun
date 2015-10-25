@@ -24,7 +24,7 @@ namespace BosunCore
         bool stop = false;
         Thread monThread = null;
         AutoResetEvent waitforevent = new AutoResetEvent(false);
-        
+        WatchKeeper server = null;
         Dictionary<string, long> eddbSystems = new Dictionary<string, long>();
 
         public FirstMate(ShipLocator lm)
@@ -33,8 +33,7 @@ namespace BosunCore
 
             lm.EnterStarSystem += OnEnterSystem;
             lm.BeginDocking += OnDockingRequestGranted;
-            lm.FoundCommander += OnFoundCommander;
-
+            lm.FoundCommander += OnFoundCommander;            
             logmon.Update();
         }
 
@@ -82,8 +81,7 @@ namespace BosunCore
                 long sysid;
                 if (LookupEDDBSystemID(name, out sysid))
                 {
-                    var surl = String.Format("http://eddb.io/system/{0}", sysid);
-                    StarSystemEntered(name, sysid, surl);
+                    StarSystemEntered(name, sysid, GetEDDBSystemUrl(name));
                 }
             }
             waitforevent.Set();
@@ -112,6 +110,11 @@ namespace BosunCore
 
         public void Start()
         {
+            if (server == null)
+            {
+                server = new WatchKeeper(this);
+                server.BeginListen();
+            }        
             if (monThread == null)
             {
                 lock (logmon)
@@ -129,12 +132,30 @@ namespace BosunCore
             lock (logmon)
             {
                 stop = true;
+                try
+                {
+                    server.StopServer();
+                }
+                finally
+                {
+                    server = null;
+                }
             }
         }
 
         public void Wait()
         {
             waitforevent.WaitOne();            
+        }
+
+        public string GetEDDBSystemUrl(string name)
+        {
+            long sysid;
+            if (LookupEDDBSystemID(name, out sysid))
+            {
+                return String.Format("http://eddb.io/system/{0}", sysid);
+            }
+            return null;
         }
 
         public bool LookupEDDBSystemID(string name, out long sysid)
@@ -160,16 +181,17 @@ namespace BosunCore
                                         {
                                             sysid = long.Parse(item["id"]);
                                             eddbSystems[name] = sysid;
-                                            return true;
                                         }
                                         catch (FormatException)
                                         {
+                                            return false;
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                    return eddbSystems.TryGetValue(name, out sysid);
                 }
                 finally
                 {
