@@ -82,9 +82,13 @@ namespace Bosun
                             var h1 = ele as mshtml.HTMLHeadElement;
                             if (h1 != null)
                             {
-                                scrolly = h1.offsetTop;
-                                doc.parentWindow.scrollTo(0, scrolly);
-                                // would like to scroll to this somehow..
+                                try
+                                {
+                                    scrolly = h1.offsetTop;
+                                    doc.parentWindow.scrollTo(0, scrolly);
+                                    // would like to scroll to this somehow..
+                                }
+                                catch { }
                             }
                             break;
                         }
