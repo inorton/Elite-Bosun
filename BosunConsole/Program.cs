@@ -51,15 +51,18 @@ namespace BosunConsole
                 eddir = ShipLocator.GetLogFolder();                
             } while (eddir == null);
 
+            LogMessage("Using {0} for logs", eddir);
 
             var sl = new ShipLocator();
 
+            LogMessage("Appointing First Mate..");
             var bc = new BosunCore.FirstMate(sl);
 
             if (bc.CommanderName != null)
             {
                 bc_FoundCommander(bc.CommanderName);
             }
+
             if (bc.LastSystemName != null)
             {
                 long sysid;
@@ -75,6 +78,10 @@ namespace BosunConsole
             bc.DockingRequestGranted += bc_DockingRequestGranted;
 
             bc.Start();
+
+            LogMessage("First Mate has appointed a Watch Keeper for port {0}",
+                bc.WatchKeeperPort);
+
 
             while (true)
             {

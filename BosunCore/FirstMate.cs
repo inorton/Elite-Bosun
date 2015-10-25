@@ -39,6 +39,14 @@ namespace BosunCore
             logmon.Update();
         }
 
+        public int WatchKeeperPort
+        {
+            get
+            {
+                return server.Port;
+            }
+        }
+
         public event SystemArrivalHandler StarSystemEntered;
         public event LogMonitor.StationDockStartHandler DockingRequestGranted;
         public event LogMonitor.CommanderInfoFound FoundCommander;

@@ -44,26 +44,56 @@ namespace LogMonitor
             return null;
         }
 
-        static string edFolder = null;
+        static string EDFolder = null;
 
         public static void OverrideEDFolder(string path)
         {
-            edFolder = path;
+            EDFolder = path;
+        }
+
+        static Process EDProcess = null;
+        static Process FindEDProcess()
+        {
+            var procs = Process.GetProcessesByName("EliteDangerous32");
+            if (procs.Length == 1)
+            {
+                var ed = procs[0];
+                var edexe = ed.MainModule.FileName;                
+                EDProcess = ed;
+            }
+            return EDProcess;
+        }
+
+        
+        public static bool CheckEDRunning()
+        {
+            if (EDProcess == null)
+            {
+                FindEDProcess();
+            }
+            if (EDProcess != null)
+            {
+                return EDProcess.HasExited == false;
+            }
+            return false;
         }
 
         public static string FindEDFolder()
         {
-            if (edFolder == null)
+            if (EDFolder == null)
             {
                 // look for ED running.
-                var procs = Process.GetProcessesByName("EliteDangerous32");
-                if (procs.Length == 1) {
-                    var ed = procs[0];
-                    var edexe = ed.MainModule.FileName;
-                    edFolder = Path.GetDirectoryName(edexe);
+                if (CheckEDRunning())
+                {
+                    var ed = FindEDProcess();
+                    if (ed != null)
+                    {
+                        var edexe = ed.MainModule.FileName;
+                        EDFolder = Path.GetDirectoryName(edexe);
+                    }
                 }
             }
-            return edFolder;
+            return EDFolder;
         }
 
         static string logdir = null;
