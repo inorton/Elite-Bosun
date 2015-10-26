@@ -8,6 +8,8 @@ using System.Threading;
 using System.Net;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 
 namespace BosunCore
 {
@@ -185,27 +187,17 @@ namespace BosunCore
                     {
                         var eddburl = String.Format("http://eddb.io/system/search?system%5Bmultiname%5D={0}", name);
                         var jsonstr = GetJsonString(eddburl);
-                        var data = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(jsonstr);
+
+                        dynamic data = JsonConvert.DeserializeObject(jsonstr);
 
                         foreach (var item in data) {
-                            if (item.ContainsKey("id"))
+                            try
                             {
-                                if (item.ContainsKey("name"))
-                                {
-                                    if (item["name"] == name)
-                                    {
-                                        try
-                                        {
-                                            sysid = long.Parse(item["id"]);
-                                            eddbSystems[name] = sysid;
-                                        }
-                                        catch (FormatException)
-                                        {
-                                            return false;
-                                        }
-                                    }
-                                }
+                                sysid = long.Parse(item.id.ToString());
+                                eddbSystems[item.name.ToString()] = sysid;
                             }
+                            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException) { }
+                            catch (FormatException) { }                            
                         }
                     }
                     return eddbSystems.TryGetValue(name, out sysid);
