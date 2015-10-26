@@ -140,6 +140,7 @@ namespace BosunCore
                 {
                     stop = false;
                     var mt = new Thread(LogMonitorThread);
+                    mt.IsBackground = true;
                     mt.Start();
                     monThread = mt;
                 }

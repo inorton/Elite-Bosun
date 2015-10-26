@@ -67,7 +67,8 @@ namespace Bosun
         }        
 
         void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
+        {            
+            Mate.Stop();
             BosunConfiguration.Save();
         }
 
@@ -114,8 +115,8 @@ namespace Bosun
                 CurrentSystemNameLabel.Content = sysname;
                 CurrentSystemUrlLabel.Content = url;
                 if (url != null)
-                {
-                    MainBrowser.Source = new Uri(url);
+                {                    
+                    MainBrowser.Navigate(new Uri(url));
                 }
             }));
         }
